@@ -37,18 +37,32 @@ async function generateReports({ onlyInQueue = false } = {}) {
   const since = new Date();
   since.setMonth(since.getMonth() - 3);
 
-  const query = {
-    createdAt: { $gte: since },
-    ...(onlyInQueue
-      ? { "webhookResponse.status": "in-queue", encodeId: { $exists: true, $ne: "" } }
-      : {}),
-  };
+  // Use aggregation pipeline for better performance
+  const pipeline = [
+    {
+      $match: {
+        createdAt: { $gte: since },
+        ...(onlyInQueue
+          ? { "webhookResponse.status": "in-queue", encodeId: { $exists: true, $ne: "" } }
+          : {}),
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    },
+    {
+      $limit: 5000 // Reasonable limit for email reports
+    }
+  ];
 
-  const allDocs = await Drives.find(query).sort({ createdAt: -1 }).lean();
+  const allDocs = await Drives.aggregate(pipeline);
 
   // Lookup WAC configs
   const appIds = [...new Set(allDocs.map((d) => String(d.videoAppId)).filter(Boolean))];
-  const wacConfigs = await WacConfig.find({ videoAppId: { $in: appIds } }).lean();
+  const wacConfigs = await WacConfig.find(
+    { videoAppId: { $in: appIds } },
+    { videoAppId: 1, appName: 1, appUrl: 1 } // Only fetch needed fields
+  ).lean();
 
   const wacMap = {};
   wacConfigs.forEach((cfg) => {
