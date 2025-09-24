@@ -20,6 +20,7 @@ getConnection("driveProd");
 
 const app = express();
 app.use(bodyParser.json());
+app.use(express.static('public'));
 
 
 app.get("/", (req, res) => {
@@ -134,30 +135,66 @@ app.get("/", (req, res) => {
 
 // ---------------------- API ---------------------- //
 app.get("/emails", (req, res) => {
-  res.json({ recipients: config.recipients, bcc: config.bcc });
+  res.json({ 
+    recipients: config.recipients, 
+    bcc: config.bcc,
+    total: config.recipients.length + config.bcc.length
+  });
 });
 
 app.post("/emails/add", (req, res) => {
   const { recipients, bcc } = req.body;
+  
+  if (!recipients && !bcc) {
+    return res.status(400).json({ error: "Please provide recipients or bcc emails to add" });
+  }
+  
   if (recipients) config.setRecipients([...new Set([...config.recipients, ...recipients])]);
   if (bcc) config.setBcc([...new Set([...config.bcc, ...bcc])]);
-  res.json({ recipients: config.recipients, bcc: config.bcc });
+  
+  res.json({ 
+    message: "Emails added successfully",
+    recipients: config.recipients, 
+    bcc: config.bcc,
+    total: config.recipients.length + config.bcc.length
+  });
 });
 
 app.post("/emails/remove", (req, res) => {
   const { recipients, bcc } = req.body;
+  
+  if (!recipients && !bcc) {
+    return res.status(400).json({ error: "Please provide recipients or bcc emails to remove" });
+  }
+  
   if (recipients) config.setRecipients(config.recipients.filter((r) => !recipients.includes(r)));
   if (bcc) config.setBcc(config.bcc.filter((b) => !bcc.includes(b)));
-  res.json({ recipients: config.recipients, bcc: config.bcc });
+  
+  res.json({ 
+    message: "Emails removed successfully",
+    recipients: config.recipients, 
+    bcc: config.bcc,
+    total: config.recipients.length + config.bcc.length
+  });
+});
+
+// Email management page
+app.get("/email", (req, res) => {
+  res.sendFile(__dirname + "/public/email.html");
 });
 
 // Manual trigger (for browser)
 app.get("/report", async (req, res) => {
+  res.sendFile(__dirname + "/public/index.html");
+});
+
+// API endpoint for report data
+app.get("/api/report", async (req, res) => {
   try {
-    const htmlPage = await generateReportPage();
-    res.type("html").send(htmlPage);
+    const reportData = await generateReportPage();
+    res.json(reportData);
   } catch (err) {
-    res.status(500).send("❌ " + err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
