@@ -1,0 +1,73 @@
+# 🎥 Transcoding Reporter
+
+Automated reporting system for video transcoding jobs.  
+It fetches data from **Drive** and **WAC configs**, generates reports (HTML + CSV), and sends them via **AWS SES**.
+
+---
+
+## 🚀 Features
+- Generates **summary + detailed table** for transcoding jobs.
+- Sends **email reports** with HTML body (last 50 items) and CSV attachment (all items).
+- Supports **interval-based scheduling** (every N minutes/hours/days) or **cron-style fixed times**.
+- Provides REST API for monitoring and manual triggers.
+- Dockerized for easy deployment.
+
+---
+
+## 📡 API Endpoints
+
+### 1. Get Email Recipients
+```http
+GET /emails
+
+
+2. Add Email Recipients / BCC
+POST /emails/add
+Content-Type: application/json
+
+{
+  "recipients": ["new@example.com"],
+  "bcc": ["manager@example.com"]
+}
+
+3. Remove Email Recipients / BCC
+POST /emails/remove
+Content-Type: application/json
+
+{
+  "recipients": ["user@example.com"],
+  "bcc": ["manager@example.com"]
+}
+
+4. Report Page (Browser View)
+GET /report
+
+
+Opens an HTML report page in the browser, showing:
+
+Total counts (In-Queue, Success, Failed)
+
+Full searchable/filterable table (last 3 months)
+
+
+# Report page (HTML)
+curl http://192.168.51.238:4000/report
+
+# Get recipients
+curl http://192.168.51.238:4000/emails
+
+curl -X POST https://tsc-report.pve.mogiio.com/emails/add \
+  -H "Content-Type: application/json" \
+  -d '{"recipients":["anilchauhan@mogiio.com", "waqas.qazi@mogiio.com"]}'
+
+
+  
+# Add recipient
+curl -X POST http://192.168.51.238:4000/emails/add \
+  -H "Content-Type: application/json" \
+  -d '{"recipients":["test@example.com"]}'
+
+# Remove recipient
+curl -X POST http://192.168.51.238:4000/emails/remove \
+  -H "Content-Type: application/json" \
+  -d '{"recipients":["test@example.com"]}'

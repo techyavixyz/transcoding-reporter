@@ -1,0 +1,17 @@
+services:
+  transcoding-reporter:
+    build: .
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
+    container_name: transcoding-reporter
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env.local
+    environment:
+      - TZ=Asia/Kolkata
+    volumes:
+      - ./emails.json:/app/emails.json

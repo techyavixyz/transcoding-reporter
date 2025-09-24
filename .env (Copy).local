@@ -1,0 +1,38 @@
+# MONGO_DB_URL_WAC_PROD=mongodb://root:rootpassword@216.48.176.149:27017/wac-config-prod?authSource=admin&directConnection=true
+# MONGO_DB_URL_DRIVE_PROD=mongodb://root:rootpassword@216.48.176.149:27017/drive-prod?authSource=admin&directConnection=true
+
+
+
+
+
+
+# Interval mode (default)
+SCHEDULE_MODE=interval
+# SCHEDULE_TYPE=hours
+# SCHEDULE_VALUE=4
+
+
+
+# # OR cron mode (fixed times)
+# SCHEDULE_MODE=cron
+# CRON_EXPRESSION=20 22 * * *;40 12 * * *;0 16 * * *;31 18 * * *
+# CRON_EXPRESSION=0 */4 * * *
+
+
+
+SCHEDULE_TYPE=minutes
+SCHEDULE_VALUE=1
+
+# EMAIL_RECIPIENTS=ad204476@gmail.com,avi@kloud-scaler.com
+EMAIL_BCC=
+EMAIL_SUBJECT=Video Transcoding Report (Automated)
+
+
+NAMESPACE_JK=local
+
+
+# AWS SES SMTP creds
+AWS_SES_HOST=email-smtp.ap-south-1.amazonaws.com
+AWS_SES_PORT=587
+AWS_SES_SMTP_USER=AKI
+AWS_SES_SMTP_PASS=BGRqV9zU9XuUTcrX/4

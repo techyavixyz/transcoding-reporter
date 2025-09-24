@@ -1,0 +1,26 @@
+{
+    "name": "video-reporter-email",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "server": "node server.js",
+        "dev": "concurrently \"node index.js\" \"node server.js\""
+    },
+    "dependencies": {
+        "@aws-sdk/client-ses": "^3.893.0",
+        "@aws-sdk/client-sesv2": "^3.893.0",
+        "axios": "^1.6.7",
+        "body-parser": "^1.20.2",
+        "cron-parser": "^5.4.0",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "json2csv": "^6.0.0-alpha.2",
+        "mongoose": "^7.6.3",
+        "node-cron": "^4.2.1",
+        "nodemailer": "^7.0.6"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}
