@@ -28,13 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
             settingsDropdown.classList.remove("show");
         }
     });
-    
-    // Auto-refresh every 30 seconds
-    setInterval(() => {
-        if (!searchBox.value && !statusFilter.value) {
-            loadDashboardData();
-        }
-    }, 30000);
 });
 
 function toggleSettingsDropdown() {
@@ -134,9 +127,10 @@ function renderTable(tableData) {
 }
 
 function updatePerformanceInfo(data) {
+    const cacheInfo = data.cacheInfo || {};
     performanceInfo.innerHTML = `
         <i class="fas fa-tachometer-alt"></i>
-        Query: ${data.queryTime}ms | Showing: ${Math.min(1000, data.totalRecords)} of ${data.stats.total.toLocaleString()}
+        Query: ${data.queryTime}ms | Cache: ${cacheInfo.lastUpdated || 'Unknown'} | Next update: ${cacheInfo.nextUpdate || 0}s | Showing: ${Math.min(1000, data.totalRecords)} of ${data.stats.total.toLocaleString()}
     `;
 }
 

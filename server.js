@@ -6,6 +6,34 @@ const config = require("./config");
 const { getConnection } = require("./db/connection");
 require("./environment/setEnv")();
 
+// Server-side data caching
+let cachedReportData = null;
+let lastCacheUpdate = 0;
+const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes in milliseconds
+
+// Function to update cache
+async function updateCache() {
+  try {
+    console.log("🔄 Updating report cache...");
+    const startTime = Date.now();
+    cachedReportData = await generateReportPage();
+    lastCacheUpdate = Date.now();
+    const updateTime = Date.now() - startTime;
+    console.log(`✅ Cache updated successfully in ${updateTime}ms`);
+  } catch (error) {
+    console.error("❌ Failed to update cache:", error.message);
+  }
+}
+
+// Initialize cache and set up periodic updates
+async function initializeCache() {
+  await updateCache(); // Initial cache load
+  
+  // Update cache every 2 minutes
+  setInterval(updateCache, CACHE_DURATION);
+  console.log("🕒 Cache refresh scheduled every 2 minutes");
+}
+
 console.log("ENV CHECK:", {
   SMTP_USER: process.env.AWS_SES_SMTP_USER ? "LOADED" : "MISSING",
   SCHEDULE_MODE: config.schedule.mode,
@@ -191,9 +219,28 @@ app.get("/report", async (req, res) => {
 // API endpoint for report data
 app.get("/api/report", async (req, res) => {
   try {
-    const reportData = await generateReportPage();
-    res.json(reportData);
+    // Check if cache is valid
+    const now = Date.now();
+    const cacheAge = now - lastCacheUpdate;
+    
+    if (!cachedReportData || cacheAge > CACHE_DURATION) {
+      console.log("⚠️ Cache expired or missing, updating...");
+      await updateCache();
+    }
+    
+    // Add cache info to response
+    const responseData = {
+      ...cachedReportData,
+      cacheInfo: {
+        lastUpdated: new Date(lastCacheUpdate).toLocaleString(),
+        cacheAge: Math.floor(cacheAge / 1000), // in seconds
+        nextUpdate: Math.floor((CACHE_DURATION - cacheAge) / 1000) // seconds until next update
+      }
+    };
+    
+    res.json(responseData);
   } catch (err) {
+    console.error("❌ API error:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -205,5 +252,10 @@ app.listen(PORT, () => {
   console.log(` Access the dashboard at: http://localhost:${PORT}`);
   console.log(` View reports at: http://localhost:${PORT}/report`);
   console.log(` Manage emails at: http://localhost:${PORT}/emails`);
+  
+  // Initialize cache system
+  initializeCache();
+  
+  // Initialize scheduler
   initializeScheduler();
 });

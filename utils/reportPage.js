@@ -28,7 +28,7 @@ async function generateReportPage() {
       }
     },
     {
-      $sort: { createdAt: -1 }
+      $sort: { createdAt: -1 } // Latest first
     },
     {
       $limit: 10000 // Reasonable limit for performance

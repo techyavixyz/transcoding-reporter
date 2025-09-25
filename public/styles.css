@@ -228,8 +228,10 @@ body {
 
 table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     font-size: 14px;
+    min-width: 1800px;
 }
 
 thead {
@@ -247,6 +249,25 @@ th {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Fixed column widths */
+th:nth-child(1) { width: 50px; }   /* No. */
+th:nth-child(2) { width: 200px; }  /* Drive ID */
+th:nth-child(3) { width: 120px; }  /* App ID */
+th:nth-child(4) { width: 120px; }  /* App Name */
+th:nth-child(5) { width: 150px; }  /* App URL */
+th:nth-child(6) { width: 120px; }  /* Encode ID */
+th:nth-child(7) { width: 300px; }  /* Title */
+th:nth-child(8) { width: 80px; }   /* Duration */
+th:nth-child(9) { width: 80px; }   /* Size */
+th:nth-child(10) { width: 140px; } /* Created */
+th:nth-child(11) { width: 100px; } /* Status */
+th:nth-child(12) { width: 100px; } /* Queued For */
+th:nth-child(13) { width: 80px; }  /* Source */
 }
 
 .table-row {
@@ -262,6 +283,32 @@ th {
 td {
     padding: 12px;
     vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Fixed column widths for td */
+td:nth-child(1) { width: 50px; }   /* No. */
+td:nth-child(2) { width: 200px; }  /* Drive ID */
+td:nth-child(3) { width: 120px; }  /* App ID */
+td:nth-child(4) { width: 120px; }  /* App Name */
+td:nth-child(5) { width: 150px; }  /* App URL */
+td:nth-child(6) { width: 120px; }  /* Encode ID */
+td:nth-child(7) { width: 300px; }  /* Title */
+td:nth-child(8) { width: 80px; }   /* Duration */
+td:nth-child(9) { width: 80px; }   /* Size */
+td:nth-child(10) { width: 140px; } /* Created */
+td:nth-child(11) { width: 100px; } /* Status */
+td:nth-child(12) { width: 100px; } /* Queued For */
+td:nth-child(13) { width: 80px; }  /* Source */
+
+/* Special handling for title column */
+td:nth-child(7) {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .status-badge {
