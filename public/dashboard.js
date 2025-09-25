@@ -4,6 +4,8 @@ let reportData = null;
 // DOM elements
 const searchBox = document.getElementById("searchBox");
 const statusFilter = document.getElementById("statusFilter");
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsDropdown = document.getElementById("settingsDropdown");
 const tableBody = document.getElementById("tableBody");
 const loading = document.getElementById("loading");
 const noResults = document.getElementById("noResults");
@@ -18,6 +20,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event listeners
     searchBox.addEventListener("input", filterTable);
     statusFilter.addEventListener("change", filterTable);
+    settingsBtn.addEventListener("click", toggleSettingsDropdown);
+    
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function(e) {
+        if (!settingsBtn.contains(e.target) && !settingsDropdown.contains(e.target)) {
+            settingsDropdown.classList.remove("show");
+        }
+    });
     
     // Auto-refresh every 30 seconds
     setInterval(() => {
@@ -26,6 +36,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 30000);
 });
+
+function toggleSettingsDropdown() {
+    settingsDropdown.classList.toggle("show");
+}
 
 async function loadDashboardData() {
     try {
@@ -61,6 +75,10 @@ function renderStats(stats) {
             <div class="stat-number">${stats.inQueue.toLocaleString()}</div>
             <div class="stat-label">In Queue</div>
         </div>
+        <div class="stat-card stat-progress">
+            <div class="stat-number">${stats.inProgress.toLocaleString()}</div>
+            <div class="stat-label">In Progress</div>
+        </div>
         <div class="stat-card stat-success">
             <div class="stat-number">${stats.success.toLocaleString()}</div>
             <div class="stat-label">Completed</div>
@@ -69,16 +87,12 @@ function renderStats(stats) {
             <div class="stat-number">${stats.failed.toLocaleString()}</div>
             <div class="stat-label">Failed</div>
         </div>
-        <div class="stat-card stat-pending">
-            <div class="stat-number">${stats.pending.toLocaleString()}</div>
-            <div class="stat-label">Pending</div>
-        </div>
     `;
 }
 
 function renderTable(tableData) {
     if (!tableData || tableData.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="12" class="text-center" style="padding: 40px;">No videos found</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="13" class="text-center" style="padding: 40px;">No videos found</td></tr>';
         return;
     }
     
@@ -87,12 +101,13 @@ function renderTable(tableData) {
             'success': 'status-success',
             'failed': 'status-failed',
             'in-queue': 'status-queue',
-            'pending': 'status-pending'
-        }[row.status] || 'status-pending';
+            'in-progress': 'status-progress'
+        }[row.status] || 'status-unknown';
 
         return `
             <tr class="table-row" data-status="${row.status}">
                 <td class="text-center">${row.id}</td>
+                <td class="font-mono text-sm">${row.driveId}</td>
                 <td class="font-mono text-sm">${row.videoAppId}</td>
                 <td class="font-medium">${row.appName}</td>
                 <td class="text-sm text-gray-600">${row.appUrl}</td>
@@ -137,7 +152,7 @@ function hideLoading() {
 }
 
 function showError(message) {
-    tableBody.innerHTML = `<tr><td colspan="12" class="text-center" style="padding: 40px; color: #ef4444;">${message}</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="13" class="text-center" style="padding: 40px; color: #ef4444;">${message}</td></tr>`;
     tableWrapper.style.display = "block";
 }
 

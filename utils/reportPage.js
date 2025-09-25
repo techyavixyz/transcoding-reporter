@@ -60,11 +60,11 @@ async function generateReportPage() {
     const status = doc.webhookResponse?.status;
     acc.total++;
     if (status === "in-queue") acc.inQueue++;
+    else if (status === "in-progress") acc.inProgress++;
     else if (status === "success") acc.success++;
     else if (status === "failed") acc.failed++;
-    else acc.pending++;
     return acc;
-  }, { total: 0, inQueue: 0, success: 0, failed: 0, pending: 0 });
+  }, { total: 0, inQueue: 0, inProgress: 0, success: 0, failed: 0 });
 
   const queryTime = Date.now() - startTime;
 
@@ -74,7 +74,7 @@ async function generateReportPage() {
     .map((doc, i) => {
       const createdAt = doc.createdAt ? new Date(doc.createdAt) : null;
       const wacInfo = wacMap[String(doc.videoAppId)] || { appName: "Unknown App", appUrl: "-" };
-      const status = doc.webhookResponse?.status || "pending";
+      const status = doc.webhookResponse?.status || "unknown";
       
       const queuedFor = status === "in-queue" && createdAt
         ? formatDuration(Math.floor((Date.now() - createdAt.getTime()) / 1000))
@@ -82,6 +82,7 @@ async function generateReportPage() {
 
       return {
         id: i + 1,
+        driveId: doc._id ? doc._id.toString() : "-",
         videoAppId: doc.videoAppId || "-",
         appName: wacInfo.appName,
         appUrl: wacInfo.appUrl,

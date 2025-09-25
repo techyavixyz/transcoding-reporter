@@ -145,6 +145,7 @@ async function generateReports({ onlyInQueue = false } = {}) {
 
     return {
       SN: i + 1,
+      DriveId: doc._id ? doc._id.toString() : "-",
       AppId: doc.videoAppId || "-",
       AppName: wacInfo.appName,
       AppUrl: wacInfo.appUrl,
