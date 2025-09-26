@@ -104,8 +104,8 @@ function openRetranscodeModal(driveId, wacId, title) {
     
     videoDetails.innerHTML = `
         <div class="video-info">
-            <p><strong>Drive ID:</strong> <code>${driveId}</code></p>
-            <p><strong>WAC ID:</strong> <code>${wacId}</code></p>
+            <p><strong>DriveId:</strong> <code>${driveId}</code></p>
+            <p><strong>WacId:</strong> <code>${wacId}</code></p>
             <p><strong>Title:</strong> ${title}</p>
         </div>
     `;
@@ -133,7 +133,7 @@ async function executeRetranscode() {
         const response = await fetch(`https://apis.mogiio.com/drives/retranscode/${driveId}`, {
             method: 'POST',
             headers: {
-                'app-id': wacId,
+                'app-id': wacId, // This now correctly uses the appId from drives collection
                 'Content-Type': 'application/json'
             }
         });

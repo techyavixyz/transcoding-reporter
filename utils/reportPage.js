@@ -119,7 +119,8 @@ async function generateRetranscodeData() {
     {
       $match: {
         createdAt: { $gte: since },
-        "webhookResponse.status": "in-queue"
+        "webhookResponse.status": "in-queue",
+        appId: { $exists: true, $ne: null } // Ensure appId exists for re-transcoding
       }
     },
     {
@@ -140,7 +141,7 @@ async function generateRetranscodeData() {
     return {
       id: i + 1,
       driveId: doc._id ? doc._id.toString() : "-",
-      wacId: doc.appId ? doc.appId.toString() : "-",
+      wacId: doc.appId ? doc.appId.toString() : "-", // This is the correct WAC ID from appId field
       title: doc.title || "-",
       status: doc.webhookResponse?.status || "unknown"
     };
