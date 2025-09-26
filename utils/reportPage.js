@@ -132,20 +132,6 @@ async function generateRetranscodeData() {
 
   const inQueueDocs = await Drives.aggregate(pipeline);
 
-  // Get unique app IDs
-  const appIds = [...new Set(inQueueDocs.map(d => String(d.videoAppId)).filter(Boolean))];
-  
-  // Fetch WAC configs
-  const wacConfigs = await WacConfig.find(
-    { videoAppId: { $in: appIds } },
-    { videoAppId: 1, appName: 1 }
-  ).lean();
-
-  // Create lookup map
-  const wacMap = {};
-  wacConfigs.forEach(cfg => {
-    wacMap[String(cfg.videoAppId)] = cfg.appName || "Unknown App";
-  });
 
   const queryTime = Date.now() - startTime;
 
@@ -154,8 +140,7 @@ async function generateRetranscodeData() {
     return {
       id: i + 1,
       driveId: doc._id ? doc._id.toString() : "-",
-      wacId: doc.videoAppId || "-",
-      wacName: wacMap[String(doc.videoAppId)] || "Unknown App",
+      wacId: doc.videoAppId ? doc.videoAppId.toString() : "-",
       title: doc.title || "-",
       status: doc.webhookResponse?.status || "unknown"
     };

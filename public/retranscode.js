@@ -57,7 +57,7 @@ async function loadRetranscodeData() {
 
 function renderTable(tableData) {
     if (!tableData || tableData.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 40px;">No videos in queue for re-transcoding</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 40px;">No videos in queue for re-transcoding</td></tr>';
         noResults.style.display = "block";
         tableWrapper.style.display = "none";
         return;
@@ -69,7 +69,6 @@ function renderTable(tableData) {
                 <td class="text-center">${row.id}</td>
                 <td class="font-mono text-sm">${row.driveId}</td>
                 <td class="font-mono text-sm">${row.wacId}</td>
-                <td class="font-medium">${row.wacName}</td>
                 <td class="max-w-xs truncate" title="${row.title}">${row.title}</td>
                 <td class="text-center">
                     <span class="status-badge status-queue">${row.status}</span>
@@ -170,7 +169,7 @@ function hideLoading() {
 }
 
 function showError(message) {
-    tableBody.innerHTML = `<tr><td colspan="7" class="text-center" style="padding: 40px; color: #ef4444;">${message}</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 40px; color: #ef4444;">${message}</td></tr>`;
     tableWrapper.style.display = "block";
 }
 
