@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Re-transcode Videos - Video Transcoding</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-redo"></i>
+                Re-transcode Videos
+            </h1>
+            <div class="subtitle">
+                Manage and re-process videos that are currently in queue
+            </div>
+            
+            <div class="nav-links">
+                <a href="/report" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+            
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card stat-queue">
+                    <div class="stat-number" id="totalInQueue">0</div>
+                    <div class="stat-label">Videos in Queue</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="controls-row">
+                <input type="text" id="searchBox" class="search-box" 
+                       placeholder="Search by title, WAC ID, drive ID..." />
+                
+                <div class="performance-info" id="performanceInfo">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Loading...
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+            
+            <div class="table-wrapper" id="tableWrapper" style="display: none;">
+                <table id="retranscodeTable">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Drive ID</th>
+                            <th>WAC ID</th>
+                            <th>WAC Name</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Table rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="no-results" id="noResults">
+                <i class="fas fa-search"></i>
+                <h3>No videos in queue</h3>
+                <p>All videos are currently processed or there are no videos to re-transcode</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Re-transcode Confirmation Modal -->
+    <div id="retranscodeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-redo"></i>
+                    Confirm Re-transcode
+                </h3>
+                <button class="modal-close" onclick="closeRetranscodeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to re-transcode this video?</p>
+                <div class="video-details" id="videoDetails">
+                    <!-- Video details will be populated -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRetranscodeModal()">
+                    Cancel
+                </button>
+                <button class="btn btn-warning" id="confirmRetranscode">
+                    <i class="fas fa-redo"></i>
+                    Re-transcode
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i class="toast-icon"></i>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <script src="retranscode.js"></script>
+</body>
+</html>

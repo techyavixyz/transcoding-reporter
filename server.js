@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { generateReportPage } = require("./utils/reportPage");
+const { generateRetranscodeData } = require("./utils/reportPage");
 const { initializeScheduler } = require("./utils/cronScheduler");
 const config = require("./config");
 const { getConnection } = require("./db/connection");
@@ -214,6 +215,22 @@ app.get("/email", (req, res) => {
 // Manual trigger (for browser)
 app.get("/report", async (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
+});
+
+// Re-transcode page
+app.get("/retranscode", (req, res) => {
+  res.sendFile(__dirname + "/public/retranscode.html");
+});
+
+// API endpoint for re-transcode data
+app.get("/api/retranscode", async (req, res) => {
+  try {
+    const retranscodeData = await generateRetranscodeData();
+    res.json(retranscodeData);
+  } catch (err) {
+    console.error("❌ Re-transcode API error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // API endpoint for report data

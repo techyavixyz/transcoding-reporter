@@ -105,4 +105,67 @@ async function generateReportPage() {
   };
 }
 
-module.exports = { generateReportPage };
+/**
+ * Generate re-transcode data (in-queue videos only)
+ */
+async function generateRetranscodeData() {
+  const startTime = Date.now();
+  
+  // Get only in-queue videos from last 3 months
+  const since = new Date();
+  since.setMonth(since.getMonth() - 3);
+
+  const pipeline = [
+    {
+      $match: {
+        createdAt: { $gte: since },
+        "webhookResponse.status": "in-queue"
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    },
+    {
+      $limit: 1000 // Reasonable limit
+    }
+  ];
+
+  const inQueueDocs = await Drives.aggregate(pipeline);
+
+  // Get unique app IDs
+  const appIds = [...new Set(inQueueDocs.map(d => String(d.videoAppId)).filter(Boolean))];
+  
+  // Fetch WAC configs
+  const wacConfigs = await WacConfig.find(
+    { videoAppId: { $in: appIds } },
+    { videoAppId: 1, appName: 1 }
+  ).lean();
+
+  // Create lookup map
+  const wacMap = {};
+  wacConfigs.forEach(cfg => {
+    wacMap[String(cfg.videoAppId)] = cfg.appName || "Unknown App";
+  });
+
+  const queryTime = Date.now() - startTime;
+
+  // Generate table data
+  const tableData = inQueueDocs.map((doc, i) => {
+    return {
+      id: i + 1,
+      driveId: doc._id ? doc._id.toString() : "-",
+      wacId: doc.videoAppId || "-",
+      wacName: wacMap[String(doc.videoAppId)] || "Unknown App",
+      title: doc.title || "-",
+      status: doc.webhookResponse?.status || "unknown"
+    };
+  });
+
+  return {
+    tableData,
+    queryTime,
+    totalRecords: inQueueDocs.length
+  };
+}
+
+module.exports = { generateReportPage, generateRetranscodeData };
