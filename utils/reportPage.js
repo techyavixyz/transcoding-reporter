@@ -140,7 +140,7 @@ async function generateRetranscodeData() {
     return {
       id: i + 1,
       driveId: doc._id ? doc._id.toString() : "-",
-      wacId: doc.videoAppId ? doc.videoAppId.toString() : "-",
+      wacId: doc.appId ? doc.appId.toString() : "-",
       title: doc.title || "-",
       status: doc.webhookResponse?.status || "unknown"
     };
