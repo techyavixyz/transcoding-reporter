@@ -133,16 +133,36 @@ async function generateRetranscodeData() {
 
   const inQueueDocs = await Drives.aggregate(pipeline);
 
+  // Get unique app IDs for WAC config lookup
+  const appIds = [...new Set(inQueueDocs.map(d => String(d.videoAppId)).filter(Boolean))];
+  
+  // Batch fetch WAC configs
+  const wacConfigs = await WacConfig.find(
+    { videoAppId: { $in: appIds } },
+    { videoAppId: 1, appName: 1 }
+  ).lean();
+
+  // Create lookup map
+  const wacMap = {};
+  wacConfigs.forEach(cfg => {
+    wacMap[String(cfg.videoAppId)] = {
+      appName: cfg.appName || "Unknown App"
+    };
+  });
 
   const queryTime = Date.now() - startTime;
 
   // Generate table data
   const tableData = inQueueDocs.map((doc, i) => {
+    const wacInfo = wacMap[String(doc.videoAppId)] || { appName: "Unknown App" };
+    
     return {
       id: i + 1,
       driveId: doc._id ? doc._id.toString() : "-",
       wacId: doc.appId ? doc.appId.toString() : "-", // This is the correct WAC ID from appId field
+      appName: wacInfo.appName,
       title: doc.title || "-",
+      videoSize: formatSize(doc.videoMetadata?.size || 0),
       status: doc.webhookResponse?.status || "unknown"
     };
   });

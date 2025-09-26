@@ -303,6 +303,30 @@ td:nth-child(11) { width: 100px; } /* Status */
 td:nth-child(12) { width: 100px; } /* Queued For */
 td:nth-child(13) { width: 80px; }  /* Source */
 
+/* Re-transcoding table specific column widths */
+#retranscodeTable th:nth-child(1) { width: 50px; }   /* No. */
+#retranscodeTable th:nth-child(2) { width: 200px; }  /* DriveId */
+#retranscodeTable th:nth-child(3) { width: 120px; }  /* WacId */
+#retranscodeTable th:nth-child(4) { width: 150px; }  /* App Name */
+#retranscodeTable th:nth-child(5) { width: 300px; }  /* Title */
+#retranscodeTable th:nth-child(6) { width: 100px; }  /* Video Size */
+#retranscodeTable th:nth-child(7) { width: 100px; }  /* Status */
+#retranscodeTable th:nth-child(8) { width: 120px; }  /* Action */
+
+#retranscodeTable td:nth-child(1) { width: 50px; }   /* No. */
+#retranscodeTable td:nth-child(2) { width: 200px; }  /* DriveId */
+#retranscodeTable td:nth-child(3) { width: 120px; }  /* WacId */
+#retranscodeTable td:nth-child(4) { width: 150px; }  /* App Name */
+#retranscodeTable td:nth-child(5) { width: 300px; }  /* Title */
+#retranscodeTable td:nth-child(6) { width: 100px; }  /* Video Size */
+#retranscodeTable td:nth-child(7) { width: 100px; }  /* Status */
+#retranscodeTable td:nth-child(8) { width: 120px; }  /* Action */
+
+/* Ensure re-transcoding table has proper minimum width */
+#retranscodeTable {
+    min-width: 1240px;
+}
+
 /* Special handling for title column */
 td:nth-child(7) {
     max-width: 300px;
