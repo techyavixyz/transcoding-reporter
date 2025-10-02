@@ -44,8 +44,6 @@ async function loadRetranscodeData() {
         
         renderTable(retranscodeData.tableData);
         updateStats(retranscodeData);
-        updatePerformanceInfo(retranscodeData);
-        
         hideLoading();
         
     } catch (error) {
@@ -62,11 +60,22 @@ function renderTable(tableData) {
         tableWrapper.style.display = "none";
         return;
     }
-    
-    const rows = tableData.map(row => {
+
+    // 🔴 Filter rows that have no videoSize or just a dash
+    const filteredData = tableData.filter(row => row.videoSize && row.videoSize !== "-");
+
+    if (filteredData.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 40px;">No videos with valid size</td></tr>';
+        noResults.style.display = "block";
+        tableWrapper.style.display = "none";
+        updatePerformanceInfo({ queryTime: retranscodeData.queryTime, totalFiltered: 0 });
+        return;
+    }
+
+    const rows = filteredData.map((row, index) => {
         return `
             <tr class="table-row">
-                <td class="text-center">${row.id}</td>
+                <td class="text-center">${index + 1}</td> <!-- ✅ Auto sequence -->
                 <td class="font-mono text-sm">${row.driveId}</td>
                 <td class="font-mono text-sm">${row.wacId}</td>
                 <td class="font-medium">${row.appName}</td>
@@ -84,20 +93,24 @@ function renderTable(tableData) {
             </tr>
         `;
     }).join('');
-    
+
     tableBody.innerHTML = rows;
     noResults.style.display = "none";
     tableWrapper.style.display = "block";
+
+    // Update performance info with filtered count
+    updatePerformanceInfo({ queryTime: retranscodeData.queryTime, totalFiltered: filteredData.length });
 }
 
 function updateStats(data) {
+    // Show total count from API (original queue size)
     totalInQueue.textContent = data.totalRecords.toLocaleString();
 }
 
 function updatePerformanceInfo(data) {
     performanceInfo.innerHTML = `
         <i class="fas fa-tachometer-alt"></i>
-        Query: ${data.queryTime}ms | Showing: ${data.totalRecords} videos in queue
+        Query: ${data.queryTime}ms | Showing: ${data.totalFiltered || data.totalRecords} videos in queue
     `;
 }
 
@@ -135,7 +148,7 @@ async function executeRetranscode() {
         const response = await fetch(`https://apis.mogiio.com/drives/retranscode/${driveId}`, {
             method: 'POST',
             headers: {
-                'app-id': wacId, // This now correctly uses the appId from drives collection
+                'app-id': wacId,
                 'Content-Type': 'application/json'
             }
         });
@@ -143,7 +156,6 @@ async function executeRetranscode() {
         if (response.ok) {
             showToast('Re-transcode request sent successfully!', 'success');
             closeRetranscodeModal();
-            // Reload data to reflect changes
             setTimeout(() => loadRetranscodeData(), 2000);
         } else {
             const errorText = await response.text();
@@ -154,7 +166,6 @@ async function executeRetranscode() {
         console.error('Re-transcode error:', error);
         showToast(`Failed to re-transcode: ${error.message}`, 'error');
     } finally {
-        // Re-enable button
         confirmRetranscode.disabled = false;
         confirmRetranscode.innerHTML = '<i class="fas fa-redo"></i> Re-transcode';
     }
@@ -193,10 +204,11 @@ function filterTable() {
             if (shouldShow) visibleCount++;
         }
         
-        // Show/hide no results message
         noResults.style.display = visibleCount === 0 ? "block" : "none";
         tableWrapper.style.display = visibleCount === 0 ? "none" : "block";
-        
+
+        // Update "Showing" count dynamically when searching
+        updatePerformanceInfo({ queryTime: retranscodeData.queryTime, totalFiltered: visibleCount });
     }, 300);
 }
 
@@ -204,7 +216,6 @@ function showToast(message, type = 'success') {
     const toastIcon = toast.querySelector('.toast-icon');
     const toastMessage = toast.querySelector('.toast-message');
     
-    // Set icon based on type
     const icons = {
         success: 'fas fa-check-circle',
         error: 'fas fa-exclamation-circle',
@@ -214,13 +225,10 @@ function showToast(message, type = 'success') {
     toastIcon.className = `toast-icon ${icons[type] || icons.success}`;
     toastMessage.textContent = message;
     
-    // Set toast class
     toast.className = `toast ${type}`;
     
-    // Show toast
     setTimeout(() => toast.classList.add('show'), 100);
     
-    // Hide toast after 4 seconds
     setTimeout(() => {
         toast.classList.remove('show');
     }, 4000);
