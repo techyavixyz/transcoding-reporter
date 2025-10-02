@@ -3,9 +3,9 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "start": "node index.js",
+        "start": "node server.js",
         "server": "node server.js",
-        "dev": "concurrently \"node index.js\" \"node server.js\""
+        "dev": "concurrently  \"node server.js\""
     },
     "dependencies": {
         "@aws-sdk/client-ses": "^3.893.0",
